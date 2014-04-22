@@ -1,6 +1,11 @@
 #include "manapool.h"
 #include "card.h"
 
+void init_manapool(struct manapool_t *pool) {
+	pool->current_mp = 1;
+	pool->max_mp = 1;
+}
+
 int use_mana(struct manapool_t *pool, int amount) {
     if(amount > pool->current_mp) return 0;
     pool->current_mp -= amount;

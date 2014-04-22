@@ -8,8 +8,18 @@ struct manapool_t {
     int max_mp;
 };
 
+//init max & current mp to 1
+void init_manapool(struct manapool_t *pool);
+
+//returns 1 if there is enough mana
+//returns 0 if there is not enough mana
 int use_mana(struct manapool_t *pool, int amount);
-void gain_mana(struct manapool_t *pool, int gain);
+
+//gain fixed amount of mana (cannot be more than max_mp)
+void gain_mana(struct manapool_t *pood, int gain);
+
+//returns 1 if can put card
+//returns 0 if can not put card
 int can_put_card(struct card_t card, struct manapool_t pool);
 
 #endif

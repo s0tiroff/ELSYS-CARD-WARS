@@ -9,17 +9,17 @@ int main() {
 	struct card_t card5 = {"Rumble", 0, 15, 4};
 	
 	printf("winner (Renekton vs Shyvana): %d\n", attack(&card3, &card2));
-	printf("Renekton: %d / %d hp\n", card3.hp, 18);
-	printf("Shyvana: %d / %d hp\n", card2.hp, 4);
+	print_card(card3);
+	print_card(card2);
 	printf("\nwinner (Skarner vs Renekton): %d\n", attack(&card1, &card3));
-	printf("Skarner: %d / %d hp\n", card1.hp, 6);
-	printf("Renekton: %d / %d hp\n", card3.hp, 18);
+	print_card(card1);
+	print_card(card3);
 	printf("\nwinner (Renekton vs Rammus): %d\n", attack(&card3, &card4));	
-	printf("Renekton: %d / %d hp\n", card3.hp, 18);
-	printf("Rammus: %d / %d hp\n", card4.hp, 10);
+	print_card(card3);
+	print_card(card4);
 	printf("\nwinner (Renekton vs Rumble): %d\n", attack(&card3, &card5));
-	printf("Renekton: %d / %d hp\n", card3.hp, 18);
-	printf("Rumble: %d / %d hp\n", card5.hp, 4);
+	print_card(card3);
+	print_card(card5);
 	
  
 	return 0;
