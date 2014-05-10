@@ -1,6 +1,12 @@
 #include <stdio.h>
 #include "board.h"
 
+void press_key() {
+	char ch;
+	ch = getchar();
+	ch = getchar();
+}
+
 int main() {
 	struct board_t board;
 	int side;
@@ -24,24 +30,20 @@ int main() {
 							print_board(board);
 						} else {
 							printf("There no free slots on the board!\n");
-							ch = getchar();
-							ch = getchar();
+							press_key();
 						} 
 					} else {
 						printf("Not enough mana!\n");
-						ch = getchar();
-						ch = getchar();
+						press_key();
 					}
 				} else {
 					printf("Invalid card!\n");
-					ch = getchar();
-					ch = getchar();
+					press_key();
 				}
 			}
 		} while(card != -1);
-		printf("Press any ket to continue...\n");
-		ch = getchar();
-		ch = getchar();
+		printf("Press enter to continue...\n");
+		press_key();
 		turn_end(&board, side);
 		side = !side;
 	}
