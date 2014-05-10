@@ -21,7 +21,10 @@ void print_hand(struct player_t pl) {
 		printf(" ");
 		print_card(pl.hand.card[i]);
 		printf(" |");
-		if(i == 5) printf("\n|");
+		if(i == 5) {
+			printf("\n");
+			if(i + 1 < pl.hand.top) printf("|");
+		}
 	}
 	printf("\n");
 }
