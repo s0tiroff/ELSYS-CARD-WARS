@@ -1,27 +1,27 @@
 #include <stdio.h>
 #include "board.h"
 
-void press_key() {
-	char ch;
-	ch = getchar();
-	ch = getchar();
-}
-
 int main() {
 	struct board_t board;
 	struct card_t buff = {"buff", 0, 0, 0};
 	int side;
 	int card;
+	int AI, FULL; //FULL flags the AI bot when the board has no empty slots
 	char ch;
-	game_begin(&board, &side);
+	game_begin(&board, &side, &AI);
 	while( !winner(board) ) {
+		FULL = 0;
 		turn_begin(&board.pl[side]);
 		do {
 			system("clear");
 			printf("%s is on turn!\n", board.pl[side].name);
 			print_board(board);
 			printf("%s is on turn (-1 to end the turn): ", board.pl[side].name);
-			scanf("%d", &card);
+			if(side && AI) {
+				AI_bot(board.pl[1], &card, FULL);
+			} else {
+				scanf("%d", &card);
+			}
 			if( card != -1) {			
 				if( card > 0 && card <= board.pl[side].hand.top ) {
 					card--;
@@ -32,22 +32,38 @@ int main() {
 							system("clear");
 							print_board(board);
 						} else {
+							FULL = 1;
 							printf("There no free slots on the board!\n");
-							press_key();
+							if(!AI) {
+								press_key();
+							} else if(!side) {
+								press_key();
+							}
 						} 
 					} else {
 						printf("Not enough mana!\n");
-						press_key();
+						if(!AI) {
+							press_key();
+						} else if(!side) {
+							press_key();
+						}
 					}
 				} else {
 					printf("Invalid card!\n");
-					press_key();
+					if(!AI) {
+						press_key();
+					} else if(!side) {
+						press_key();						
+					}
 				}
 			}
 		} while(card != -1);
-		printf("Press enter to continue...\n");
-		press_key();
-		turn_end(&board, side);
+		if(board.pl[0].turn == board.pl[1].turn) {
+			if(side && AI) printf("\n");		
+			printf("Press enter to continue...\n");
+			press_key();
+			turn_end(&board);
+		}
 		side = !side;
 	}
 	system("clear");

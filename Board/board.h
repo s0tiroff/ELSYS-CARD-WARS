@@ -23,9 +23,9 @@ int is_slot_empty(struct board_t board, int side, int corr);
 //returns 1 if successful
 //returns 0 if failure
 int play_card(struct board_t *board, struct card_t card, int side);
-//cards on board[side] attacks 
+//cards on board attacks 
 //if there are no enemies pl[!side] takes the dmg
-void turn_end(struct board_t *board, int side);
+void turn_end(struct board_t *board);
 //returns 0 if there is no winner
 //returns 1 if player1 is the winner
 //returns 2 if player2 is the winner
@@ -36,6 +36,11 @@ int load_deck_from_file(struct board_t *board, int side, char *filename);
 //init player to starting stats
 //reads names
 //load decks
-void game_begin(struct board_t *board, int *side);
+void game_begin(struct board_t *board, int *side, int *AI);
+//waits any key to be pressed
+void press_key();
+//plays cards sorted by mana_cost
+//FULL flags the AI(bot) when the board has no empty slots
+void AI_bot(struct player_t player, int *card, int FULL);
 
 #endif

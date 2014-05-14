@@ -69,15 +69,15 @@ int play_card(struct board_t *board, struct card_t card, int side) {
 	return 0;
 }
 
-void turn_end(struct board_t *board, int side) {
+void turn_end(struct board_t *board) {
 	int corr;
 	for(corr = 0; corr < 5; corr++) {
-		if( !is_slot_empty(*board, side, corr) ) {
-			if( !is_slot_empty(*board, !side, corr) ) {
-				attack(&board->slot[side][corr], &board->slot[!side][corr]);
-			} else {
-				board->pl[!side].hp -= board->slot[side][corr].atk;
-			}
+		if( !is_slot_empty(*board, 0, corr) && !is_slot_empty(*board, 1, corr) ) {
+			attack(&board->slot[0][corr], &board->slot[1][corr]);
+		} else if( !is_slot_empty(*board, 0, corr) ) {
+			board->pl[1].hp -= board->slot[0][corr].atk;
+		} else if( !is_slot_empty(*board, 1, corr) ) {
+			board->pl[0].hp -= board->slot[1][corr].atk;
 		}
 	}
 }
@@ -113,17 +113,27 @@ int load_deck_from_file(struct board_t *board, int side, char *filename) {
 	return 1;
 }
 
-void game_begin(struct board_t *board, int *side) {
+void game_begin(struct board_t *board, int *side, int *AI) {
 	char filename[30];
 	char ch = '0';	
 	int dice1, dice2;
+	int i;
+	struct card_t drawed_card;
 	srand(time(NULL));
 	init_board(board);
-	system("clear");
+	do {
+		system("clear");
+		printf("Do you want to play against AI BOT (1 - YES / 0 - NO)? ");
+		scanf("%d", AI);
+	} while(*AI != 0 && *AI != 1);
 	printf("Enter player1's name: ");
 	scanf("%s", board->pl[0].name);
-	printf("Enter player2's name: ");
-	scanf("%s", board->pl[1].name);
+	if( !(*AI) ) {
+		printf("Enter player2's name: ");
+		scanf("%s", board->pl[1].name);
+	} else {
+		strcpy(board->pl[1].name, "AI(BOT)");
+	}
 	board->pl[0].hp = MAX_HP;
 	board->pl[1].hp = MAX_HP;
 	printf("%s's is choosing deck: ", board->pl[0].name);
@@ -152,9 +162,29 @@ void game_begin(struct board_t *board, int *side) {
 		printf("%s will begin first!\n", board->pl[1].name);
 		*side = 1;
 	}
+	for(i = 0; i < 5; i++) {
+		if(draw_card(&board->pl[0].deck, &drawed_card)) board->pl[0].hand.card[board->pl[0].hand.top++] = drawed_card;
+		if(draw_card(&board->pl[1].deck, &drawed_card)) board->pl[1].hand.card[board->pl[1].hand.top++] = drawed_card;	
+	}
 	printf("Press any key to continue...\n");
 	ch = getchar();
 	ch = getchar();
 	system("clear");
 }
 
+void AI_bot(struct player_t player, int *card, int FULL) {
+	int i;
+	int min_cost = -2;
+	if(player.hand.top == 1 && player.hand.card[0].mana_cost <= player.pool.max_mp) min_cost = 0;
+	for(i = 0; i < player.hand.top - 1; i++) {
+		if(player.hand.card[i].mana_cost <= player.hand.card[i + 1].mana_cost) min_cost = i;
+	}
+	*card = min_cost + 1;
+	if(FULL) *card = -1;
+}
+
+void press_key() {
+	char ch;
+	ch = getchar();
+	ch = getchar();
+}
