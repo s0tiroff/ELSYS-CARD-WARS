@@ -20,6 +20,14 @@ void gain_mana(struct manapool_t *pool, int gain) {
     }
 }
 
+void fill_pool(struct manapool_t *pool) {
+	pool->current_mp = pool->max_mp;
+}
+
+void add_max_mana(struct manapool_t *pool) {
+	pool->max_mp++;
+}
+
 int can_put_card(struct card_t card, struct manapool_t pool) {
     return card.mana_cost > pool.current_mp ? 0 : 1;
 }

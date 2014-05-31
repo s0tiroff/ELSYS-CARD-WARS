@@ -4,6 +4,19 @@
 #include "board.h"
 #include "board.h"
 
+void press_key() {
+	char ch;
+	ch = getchar();
+	ch = getchar();
+}
+
+void wait_for_key(int AI, int side) {
+	if(!AI) {
+		press_key();
+	} else if(!side) {
+		press_key();
+	}	
+}
 
 void init_board(struct board_t *board) {
 	int corr;
@@ -58,6 +71,14 @@ int is_slot_empty(struct board_t board, int side, int corr) {
 	return board.slot[side][corr].hp > 0 ? 0 : 1;
 }
 
+int can_play_card(struct board_t board, int side) {
+	int corr = 0;
+	for(corr = 0; corr < 5; corr++) {
+		if( is_slot_empty(board, side, corr) ) return 1;
+	}
+	return 0;
+}
+
 int play_card(struct board_t *board, struct card_t card, int side) {
 	int corr;
 	for(corr = 0; corr < 5; corr++) {
@@ -67,6 +88,46 @@ int play_card(struct board_t *board, struct card_t card, int side) {
 		}
 	}
 	return 0;
+}
+
+void on_turn(struct board_t *board, int AI, int side) {
+	int card;
+	int FULL = 0; //FULL flags the AI bot when the board has no empty slots
+	char ch;
+		do {
+			system("clear");
+			if(!(side && AI)) printf("%s is on turn!\n", board->pl[side].name);
+			print_board(*board);
+			printf("%s is on turn (-1 to end the turn): ", board->pl[side].name);
+			if(side && AI) {
+				card = AI_bot(board->pl[1], FULL);
+			} else {
+				scanf("%d", &card);
+			}
+			if( card != -1) {			
+				if( card > 0 && card <= board->pl[side].hand.top ) {
+					card--;
+					if( can_put_card(board->pl[side].hand.card[card], board->pl[side].pool) ) {
+						if( can_play_card(*board, side) ) {
+							use_mana(&board->pl[side].pool, board->pl[side].hand.card[card].mana_cost);
+							play_card(board, play_card_from_hand(&board->pl[side], card), side);
+							system("clear");
+							print_board(*board);
+						} else {
+							FULL = 1;
+							printf("There no free slots on the board!\n");
+							wait_for_key(AI, side);
+						} 
+					} else {
+						printf("Not enough mana!\n");
+						wait_for_key(AI, side);
+					}
+				} else {
+					printf("Invalid card!\n");
+					wait_for_key(AI, side);
+				}
+			}
+		} while(card != -1);
 }
 
 void turn_end(struct board_t *board) {
@@ -82,6 +143,16 @@ void turn_end(struct board_t *board) {
 	}
 }
 
+void improved_turn_end(struct board_t *board, int AI, int *side) {
+	if(board->pl[0].turn == board->pl[1].turn) {
+		if(*side && AI) printf("\n");		
+			printf("Press enter to continue...\n");
+			press_key();
+			turn_end(board);
+		}
+	*side = !(*side);
+}
+
 int winner(struct board_t board) {
 	if(board.pl[0].hp > 0 && board.pl[1].hp > 0) {
 		return 0;
@@ -89,6 +160,15 @@ int winner(struct board_t board) {
 		return 1;
 	} else {
 		return 2;
+	}
+}
+
+void print_winner(struct board_t board) {
+	system("clear");
+	if(winner(board) == 1) {
+		printf("%s won the game!\n", board.pl[0].name);
+	} else {
+		printf("%s won the game!\n", board.pl[1].name);
 	}
 }
 
@@ -172,19 +252,60 @@ void game_begin(struct board_t *board, int *side, int *AI) {
 	system("clear");
 }
 
-void AI_bot(struct player_t player, int *card, int FULL) {
+int AI_bot(struct player_t player, int FULL) {
+	if(FULL || player.hand.top == 0) return -1;
 	int i;
-	int min_cost = -2;
-	if(player.hand.top == 1 && player.hand.card[0].mana_cost <= player.pool.max_mp) min_cost = 0;
-	for(i = 0; i < player.hand.top - 1; i++) {
-		if(player.hand.card[i].mana_cost <= player.hand.card[i + 1].mana_cost) min_cost = i;
+	int min_cost = player.hand.card[0].mana_cost;
+	int card_id = 0;
+	for(i = 1; i < player.hand.top; i++) { 
+		if(player.hand.card[i].mana_cost < min_cost) card_id = i;
 	}
-	*card = min_cost + 1;
-	if(FULL) *card = -1;
+	if(player.hand.card[card_id].mana_cost > player.pool.current_mp) return -1;
+	return card_id + 1;
 }
 
-void press_key() {
-	char ch;
-	ch = getchar();
-	ch = getchar();
+int card_generator(int cards_to_generate, float balance_atk, float balance_mp, char *filename) {
+	FILE *fp;
+	int i, atk, hp, mp;
+	char card_name[] = "GENERATED";
+	srand(time(NULL));
+	fp = fopen(filename, "w");
+	if(fp == NULL) {
+		printf("An error has occured!\n");
+		return 0;
+	}
+	for(i = 0; i < cards_to_generate; i++) {
+		fprintf(fp, "%s", card_name);
+		do {
+			atk = rand() % 10 + 1;
+			hp = rand() % 12 + 1;
+		} while(atk * balance_atk > hp);
+		do {
+			mp = rand() % 10 + 1;
+		} while(mp * balance_mp > atk + hp);
+		fprintf(fp, ",%d,%d,%d\n", mp, atk, hp);
+	}
+	fclose(fp);
+	return 1;
 }
+
+void generate_deck() {
+	int generate = 0;
+	float balance_atk, balance_mp;
+	char filename[30];	
+	system("clear");
+	do {
+		printf("Do you want to generate deck (YES - 1 / NO - 0)? ");
+		scanf("%d", &generate);
+		if(generate) {
+			printf("Choose deck name: ");
+			scanf("%s", filename);
+			printf("Choose atk:hp = 1:x; x=");
+			scanf("%f", &balance_atk);
+			printf("Choose mp:(atk + hp) = 1:x; x=");
+			scanf("%f", &balance_mp);
+			card_generator(30, balance_atk, balance_mp, filename);
+		} 
+	} while(generate);
+}
+

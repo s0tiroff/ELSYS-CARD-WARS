@@ -35,6 +35,9 @@ int discard_card(struct player_t *player, int card, struct card_t *return_card);
 //return card with 0 hp if failure
 struct card_t play_card_from_hand(struct player_t *player, int card);
 //adds 1 card into player's hand
+//add 1 to player's turn
+//max_mana=player.turn
+//fills mana_pool
 void turn_begin(struct player_t *player);
 
 #endif

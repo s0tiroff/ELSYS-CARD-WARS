@@ -63,6 +63,6 @@ void turn_begin(struct player_t *player) {
 	struct card_t drawed_card;
 	if(draw_card(&player->deck, &drawed_card)) player->hand.card[player->hand.top++] = drawed_card;		
 	player->turn++;
-	player->pool.max_mp = player->turn;
-	player->pool.current_mp = player->pool.max_mp;
+	add_max_mana(&player->pool);
+	fill_pool(&player->pool);
 }
