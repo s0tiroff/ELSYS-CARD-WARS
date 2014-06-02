@@ -2,8 +2,8 @@
 #include "deck.h"
 
 void init_deck(struct deck_t *deck) {
-	memset(deck, 0, sizeof(*deck));
-	deck->top = 0;
+memset(deck, 0, sizeof(*deck));
+deck->top = 0;
 }
 
 int push_card(struct card_t card_to_push, struct deck_t *player_deck){
