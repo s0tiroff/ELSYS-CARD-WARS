@@ -1,8 +1,10 @@
 #ifndef ___card___
 #define ___card___
 
+#define max_chars_in_card_name 30
+
 struct card_t {
-    char *name;
+    char name[max_chars_in_card_name];
     int mana_cost;
     int atk;
     int hp;
