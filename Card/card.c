@@ -2,14 +2,14 @@
 #include "card.h"
 
 void print_card(struct card_t card) {
-	printf("%s(%d) (%d|%d)\n", card.name, card.mana_cost, card.atk, card.hp);
+printf("%d|%d(%d)", card.atk, card.hp, card.mana_cost);
 }
 
 //returns 0 if both cards are death
 //returns 1 if the attacker won returns 2 if the defender won
 //returns 3 if both cards are alive
 int attack(struct card_t *attacker, struct card_t *defender) {
-	defender->hp -= attacker->atk;
+defender->hp -= attacker->atk;
     attacker->hp -= defender->atk;
     if(attacker->hp > 0 && defender->hp > 0) {
         return 3;
@@ -27,4 +27,3 @@ int attack(struct card_t *attacker, struct card_t *defender) {
         }
     }
 }
-
