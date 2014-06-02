@@ -38,18 +38,12 @@ void change_hp(struct player_t *player, int hp) {
 	}
 }
 
-int discard_card(struct player_t *player, int card, struct card_t *return_card) {
-	if(player->hand.top == 0) return 0;
-	*return_card = player->hand.card[card];
-	player->hand.top--;
-	return 1;
-}
-
 struct card_t play_card_from_hand(struct player_t *player, int card) {
 	int i;	
-	struct card_t played_card;
+	struct card_t played_card = player->hand.card[card];
 	struct card_t error=error_card;
-	if(discard_card(player, card, &played_card)) {
+	if(player->hand.top) {
+		player->hand.top--;
 		for(i = card + 1; i <= player->hand.top; i++) {
 			player->hand.card[i - 1] = player->hand.card[i];
 		}

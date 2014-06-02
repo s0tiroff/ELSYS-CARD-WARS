@@ -98,7 +98,7 @@ void on_turn(struct board_t *board, int AI, int side) {
 			system("clear");
 			if(!(side && AI)) printf("%s is on turn!\n", board->pl[side].name);
 			print_board(*board);
-			printf("%s is on turn (-1 to end the turn): ", board->pl[side].name);
+			if(!(side && AI)) printf("%s is on turn (-1 to end the turn): ", board->pl[side].name);
 			if(side && AI) {
 				card = AI_bot(board->pl[1], FULL);
 			} else {
@@ -115,7 +115,7 @@ void on_turn(struct board_t *board, int AI, int side) {
 							print_board(*board);
 						} else {
 							FULL = 1;
-							printf("There no free slots on the board!\n");
+							printf("There are no free slots on the board!\n");
 							wait_for_key(AI, side);
 						} 
 					} else {
