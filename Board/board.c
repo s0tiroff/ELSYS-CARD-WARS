@@ -2,7 +2,6 @@
 #include <string.h>
 #include <time.h>
 #include "board.h"
-#include "board.h"
 
 void press_key() {
 	char ch;
